@@ -16,7 +16,7 @@ import com.chwilio.resources.TweetResource;
 public class TweetQuerying {
 	@RequestMapping(method = RequestMethod.GET, value = "/tweets/all")
 	@ResponseBody
-	public List<Tweet> getAllStudents(@RequestParam("query") String query) throws SolrServerException, IOException {
-		return new TweetResource().searchQuery(query);
+	public List<Tweet> getAllTweets(@RequestParam("query") String query) throws SolrServerException, IOException {
+		return TweetResource.searchQuery(query);
 	}
 }
