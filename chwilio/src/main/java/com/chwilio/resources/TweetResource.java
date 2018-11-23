@@ -18,7 +18,7 @@ import com.chwilio.config.SolrConfig;
 
 public class TweetResource {
 	public static List<Tweet> searchQuery(String query) throws SolrServerException, IOException{
-		final SolrClient client = new SolrConfig().getSolrClient();
+		final SolrClient client = SolrConfig.getSolrClient();
 		
 		final Map<String, String> queryParamMap = new HashMap<String, String>();
 		queryParamMap.put("q", query.toString());
