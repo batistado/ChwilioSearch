@@ -1,9 +1,9 @@
-package com.chwilio.beans;
+package com.chwilio.model;
 
 import java.util.Date;
 
 public class Tweet {
-    private String id;
+	private String id;
     private String text;
     private String city;
     private String lang;

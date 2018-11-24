@@ -1,8 +1,7 @@
-package com.chwilio.resources;
+package com.chwilio.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,21 +12,20 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.MapSolrParams;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import com.chwilio.beans.*;
 import com.chwilio.config.SolrConfig;
+import com.chwilio.model.*;
 
-public class TweetResource {	
-	private static String id;
-    private static String text;
-    private static String city;
-    private static String lang;
-    private static Date date;
-    private static String topic;
+@Service
+public class SearchService implements SearchQueryService {
+	@Autowired
+	private SolrConfig solr;
 	
-	@SuppressWarnings("unchecked")
-	public static List<Tweet> searchQuery(String query, String page) throws SolrServerException, IOException{
-		final SolrClient client = SolrConfig.getSolrClient();
+	@Override
+	public List<Tweet> searchQuery(String query) throws SolrServerException, IOException{
+		final SolrClient client = solr.getSolrClient();
 		
 		//  Computing the start from the page number
 		Integer pageNumber = Integer.parseInt(page);
@@ -54,12 +52,6 @@ public class TweetResource {
 			topic = document.containsKey("topic") ? ((ArrayList<String>) document.getFieldValue("topic")).get(0) : null;
 			
 			searchResults.add(new Tweet(id, text, city, lang, date, topic));
-			
-//		  searchResults.add(new Tweet(document.getFieldValue("id").toString(), 
-//				  		((ArrayList<String>) document.getFieldValue("text")).get(0),
-//				  		((ArrayList<String>) document.getFieldValue("city")).get(0),
-//				  		document.getFieldValue("tweet_lang").toString(),
-//				  		((ArrayList<Date>) document.getFieldValue("tweet_date")).get(0)));
 		}
 		
 		return searchResults;
