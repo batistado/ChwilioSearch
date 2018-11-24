@@ -1,4 +1,4 @@
-package com.chwilio.beans;
+package com.chwilio.model;
 
 public class Tweet {
     private String id;
