@@ -8,5 +8,5 @@ import org.apache.solr.client.solrj.SolrServerException;
 import com.chwilio.model.Tweet;
 
 public interface SearchQueryService {
-	public List<Tweet> searchQuery(String query) throws SolrServerException, IOException;
+	public List<Tweet> searchQuery(String query, String page) throws SolrServerException, IOException;
 }

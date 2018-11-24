@@ -2,6 +2,7 @@ package com.chwilio.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,12 +23,21 @@ import com.chwilio.model.*;
 public class SearchService implements SearchQueryService {
 	@Autowired
 	private SolrConfig solr;
+	private String id;
+	private String text;
+	private String city;
+	private String lang;
+	private Date date;
+	private String topic;
+	private String username;
+	private String tweetUrl;
+	private String userProfileImage;
 	
+	@SuppressWarnings("unchecked")
 	@Override
-	public List<Tweet> searchQuery(String query) throws SolrServerException, IOException{
+	public List<Tweet> searchQuery(String query, String page) throws SolrServerException, IOException{
 		final SolrClient client = solr.getSolrClient();
 		
-<<<<<<< HEAD
 		//  Computing the start from the page number
 		Integer pageNumber = Integer.parseInt(page);
 		Integer start = (pageNumber-1)*10;
@@ -51,20 +61,11 @@ public class SearchService implements SearchQueryService {
 			lang = document.containsKey("lang") ? document.getFieldValue("tweet_lang").toString() : null;
 			date = document.containsKey("tweet_date") ? ((ArrayList<Date>) document.getFieldValue("tweet_date")).get(0) : null;
 			topic = document.containsKey("topic") ? ((ArrayList<String>) document.getFieldValue("topic")).get(0) : null;
+			username = document.containsKey("user.name") ? ((ArrayList<String>) document.getFieldValue("user.name")).get(0) : null;
+			tweetUrl = "https://twitter.com/statuses/" + id;
+			userProfileImage = document.containsKey("user.profile_image_url") ? ((ArrayList<String>) document.getFieldValue("user.profile_image_url")).get(0) : null;
 			
-			searchResults.add(new Tweet(id, text, city, lang, date, topic));
-=======
-		final Map<String, String> queryParamMap = new HashMap<String, String>();
-		queryParamMap.put("q", query.toString());
-		MapSolrParams queryParams = new MapSolrParams(queryParamMap);
-
-		final QueryResponse response = client.query("IRF18P4", queryParams);
-		final SolrDocumentList documents = response.getResults();
-		
-		List<Tweet> searchResults = new ArrayList<Tweet>();
-		for(SolrDocument document : documents) {
-		  searchResults.add(new Tweet(document.getFieldValue("id").toString(), ((ArrayList<String>) document.getFieldValue("text")).get(0)));
->>>>>>> refs/remotes/origin/master
+			searchResults.add(new Tweet(id, text, city, lang, date, topic, username, tweetUrl, userProfileImage));
 		}
 		
 		return searchResults;
