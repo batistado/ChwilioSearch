@@ -27,6 +27,7 @@ public class SearchService implements SearchQueryService {
 	public List<Tweet> searchQuery(String query) throws SolrServerException, IOException{
 		final SolrClient client = solr.getSolrClient();
 		
+<<<<<<< HEAD
 		//  Computing the start from the page number
 		Integer pageNumber = Integer.parseInt(page);
 		Integer start = (pageNumber-1)*10;
@@ -52,6 +53,18 @@ public class SearchService implements SearchQueryService {
 			topic = document.containsKey("topic") ? ((ArrayList<String>) document.getFieldValue("topic")).get(0) : null;
 			
 			searchResults.add(new Tweet(id, text, city, lang, date, topic));
+=======
+		final Map<String, String> queryParamMap = new HashMap<String, String>();
+		queryParamMap.put("q", query.toString());
+		MapSolrParams queryParams = new MapSolrParams(queryParamMap);
+
+		final QueryResponse response = client.query("IRF18P4", queryParams);
+		final SolrDocumentList documents = response.getResults();
+		
+		List<Tweet> searchResults = new ArrayList<Tweet>();
+		for(SolrDocument document : documents) {
+		  searchResults.add(new Tweet(document.getFieldValue("id").toString(), ((ArrayList<String>) document.getFieldValue("text")).get(0)));
+>>>>>>> refs/remotes/origin/master
 		}
 		
 		return searchResults;
