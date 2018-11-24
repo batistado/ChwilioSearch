@@ -21,7 +21,7 @@ public class TweetQuerying {
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/tweets/all")
 	@ResponseBody
-	public List<Tweet> getAllTweets(@RequestParam("query") String query) throws SolrServerException, IOException {
-		return searchService.searchQuery(query);
+	public List<Tweet> getAllTweets(@RequestParam("query") String query, @RequestParam("page") String page) throws SolrServerException, IOException {
+		return searchService.searchQuery(query, page);
 	}
 }
