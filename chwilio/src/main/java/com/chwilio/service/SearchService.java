@@ -35,7 +35,7 @@ public class SearchService implements SearchQueryService {
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Tweet> searchQuery(String query, String page) throws SolrServerException, IOException{
+	public Map<String, Object> searchQuery(String query, String page) throws SolrServerException, IOException{
 		final SolrClient client = solr.getSolrClient();
 		
 		//  Computing the start from the page number
@@ -53,6 +53,9 @@ public class SearchService implements SearchQueryService {
 		final SolrDocumentList documents = response.getResults();
 		
 		List<Tweet> searchResults = new ArrayList<Tweet>();
+		Map<String, Object> result = new HashMap<String,Object>();
+		
+		
 		for(SolrDocument document : documents) {
 			
 			id = document.containsKey("id") ? document.getFieldValue("id").toString() : null;
@@ -68,7 +71,10 @@ public class SearchService implements SearchQueryService {
 			searchResults.add(new Tweet(id, text, city, lang, date, topic, username, tweetUrl, userProfileImage));
 		}
 		
-		return searchResults;
+		result.put("numberOfTweets", response.getResults().getNumFound());
+		result.put("tweets", searchResults);
+		
+		return result;
 	}
 
 }
