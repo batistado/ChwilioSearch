@@ -23,6 +23,7 @@ import com.chwilio.model.*;
 public class SearchService implements SearchQueryService {
 	@Autowired
 	private SolrConfig solr;
+	
 	private String id;
 	private String text;
 	private String city;
@@ -60,15 +61,16 @@ public class SearchService implements SearchQueryService {
 			
 			id = document.containsKey("id") ? document.getFieldValue("id").toString() : null;
 			text = document.containsKey("text") ? ((ArrayList<String>) document.getFieldValue("text")).get(0) : null;
-			city = document.containsKey("city") ? ((ArrayList<String>) document.getFieldValue("city")).get(0) : null;
-			lang = document.containsKey("lang") ? document.getFieldValue("tweet_lang").toString() : null;
-			date = document.containsKey("tweet_date") ? ((ArrayList<Date>) document.getFieldValue("tweet_date")).get(0) : null;
-			topic = document.containsKey("topic") ? ((ArrayList<String>) document.getFieldValue("topic")).get(0) : null;
-			username = document.containsKey("user.name") ? ((ArrayList<String>) document.getFieldValue("user.name")).get(0) : null;
-			tweetUrl = "https://twitter.com/statuses/" + id;
-			userProfileImage = document.containsKey("user.profile_image_url") ? ((ArrayList<String>) document.getFieldValue("user.profile_image_url")).get(0) : null;
-			
-			searchResults.add(new Tweet(id, text, city, lang, date, topic, username, tweetUrl, userProfileImage));
+//			city = document.containsKey("city") ? ((ArrayList<String>) document.getFieldValue("city")).get(0) : null;
+//			lang = document.containsKey("lang") ? document.getFieldValue("tweet_lang").toString() : null;
+//			date = document.containsKey("tweet_date") ? ((ArrayList<Date>) document.getFieldValue("tweet_date")).get(0) : null;
+//			topic = document.containsKey("topic") ? ((ArrayList<String>) document.getFieldValue("topic")).get(0) : null;
+//			username = document.containsKey("user.name") ? ((ArrayList<String>) document.getFieldValue("user.name")).get(0) : null;
+//			tweetUrl = "https://twitter.com/statuses/" + id;
+//			userProfileImage = document.containsKey("user.profile_image_url") ? ((ArrayList<String>) document.getFieldValue("user.profile_image_url")).get(0) : null;
+//			
+			//searchResults.add(new Tweet(id, text, city, lang, date, topic, username, tweetUrl, userProfileImage));
+			searchResults.add(new Tweet(id, text));
 		}
 		
 		result.put("numberOfTweets", response.getResults().getNumFound());

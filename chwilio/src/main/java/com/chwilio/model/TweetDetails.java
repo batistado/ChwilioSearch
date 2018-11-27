@@ -2,9 +2,7 @@ package com.chwilio.model;
 
 import java.util.Date;
 
-public class Tweet {
-	private String id;
-    private String text;
+public class TweetDetails extends Tweet {
     private String city;
     private String lang;
     private Date date;
@@ -13,9 +11,8 @@ public class Tweet {
     private String tweetUrl;
     private String userProfileImage;
 
-	public Tweet(String id, String text, String city, String lang, Date date, String topic, String username, String tweetUrl, String userProfileImage) {
-    	this.id = id;
-    	this.text = text;
+	public TweetDetails(String id, String text, String city, String lang, Date date, String topic, String username, String tweetUrl, String userProfileImage) {
+    	super(id, text);
     	this.city = city;
     	this.lang = lang;
     	this.date = date;
@@ -47,22 +44,6 @@ public class Tweet {
 
 	public void setUsername(String username) {
 		this.username = username;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getText() {
-		return text;
-	}
-
-	public void setText(String text) {
-		this.text = text;
 	}
 	
 	public String getCity() {
