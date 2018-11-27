@@ -78,5 +78,18 @@ public class SearchService implements SearchQueryService {
 		
 		return result;
 	}
+	
+	public TweetDetails getTweetDetails(String id) throws SolrServerException, IOException {
+		final SolrClient client = solr.getSolrClient();
+		
+		final Map<String, String> queryParamMap = new HashMap<String, String>();
+		queryParamMap.put("q", "id:" + id);
+		MapSolrParams queryParams = new MapSolrParams(queryParamMap);
+
+		final QueryResponse response = client.query("IRF18P4", queryParams);
+		final SolrDocumentList documents = response.getResults();
+		
+		return new TweetDetails(documents[0].getFieldValue(""))
+	}
 
 }
