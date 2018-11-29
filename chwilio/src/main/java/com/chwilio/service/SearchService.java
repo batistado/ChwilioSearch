@@ -110,4 +110,15 @@ public class SearchService implements SearchQueryService {
 		
 		return new TweetDetails(id, text, city, lang, date, topic, username, tweetUrl, userProfileImage);	
 	}
+	
+	public Map<String, String> getTranslatedTweet(Map<String, String> tweet) throws SolrServerException, IOException {
+		TranslationService tService = new TranslationService(tweet.get("text"));
+		try {
+			tweet.put("translatedText", tService.translateText(tweet.get("lang")));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return tweet;
+	}
 }

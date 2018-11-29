@@ -140,4 +140,20 @@ public class TranslationService {
         return tQuery;
     }
     
+    public String translateText(String lang) throws Exception {
+    	List<RequestBody> objList = new ArrayList<RequestBody>();
+        objList.add(new RequestBody(query));
+        String content = new Gson().toJson(objList);
+        params = "&to=" + lang;
+   
+		URL url = new URL (host + tpath + params);
+        tPrettify(Post(url, content));
+        
+        if(!hashMap.isEmpty()) {
+        	return hashMap.get(lang);
+        }
+        
+        return null;
+    }
+    
 }
