@@ -33,6 +33,7 @@ public class SearchService implements SearchQueryService {
 	private String username;
 	private String tweetUrl;
 	private String userProfileImage;
+	private String tQuery;
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -43,9 +44,20 @@ public class SearchService implements SearchQueryService {
 		Integer pageNumber = Integer.parseInt(page);
 		Integer start = (pageNumber-1)*10;
 		
+		TranslationService tService = new TranslationService(query);
+		try {
+			tQuery = tService.translateQuery();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		final Map<String, String> queryParamMap = new HashMap<String, String>();
+		if(tQuery != null) {
+			queryParamMap.put("q", tQuery.toString());
+		}else {
 		queryParamMap.put("q", query.toString());
+		}
 		queryParamMap.put("start", start.toString());
 		queryParamMap.put("rows", "10");
 		MapSolrParams queryParams = new MapSolrParams(queryParamMap);
@@ -64,7 +76,7 @@ public class SearchService implements SearchQueryService {
 			date = document.containsKey("tweet_date") ? ((ArrayList<Date>) document.getFieldValue("tweet_date")).get(0) : null;
 			username = document.containsKey("user.name") ? ((ArrayList<String>) document.getFieldValue("user.name")).get(0) : null;
 			userProfileImage = document.containsKey("user.profile_image_url") ? ((ArrayList<String>) document.getFieldValue("user.profile_image_url")).get(0) : null;
-			
+					
 			searchResults.add(new Tweet(id, text, date, username, userProfileImage));
 		}
 		
@@ -74,6 +86,7 @@ public class SearchService implements SearchQueryService {
 		return result;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public TweetDetails getTweetDetails(String id) throws SolrServerException, IOException {
 		final SolrClient client = solr.getSolrClient();
 		
@@ -95,8 +108,6 @@ public class SearchService implements SearchQueryService {
 		tweetUrl = "https://twitter.com/statuses/" + id;
 		userProfileImage = document.containsKey("user.profile_image_url") ? ((ArrayList<String>) document.getFieldValue("user.profile_image_url")).get(0) : null;
 		
-		return new TweetDetails(id, text, city, lang, date, topic, username, tweetUrl, userProfileImage);
-		
+		return new TweetDetails(id, text, city, lang, date, topic, username, tweetUrl, userProfileImage);	
 	}
-
 }
