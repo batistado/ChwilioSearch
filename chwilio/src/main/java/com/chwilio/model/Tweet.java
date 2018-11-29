@@ -16,7 +16,7 @@ public class Tweet {
     	this.username = username;
     	this.userProfileImage = userProfileImage;
 	}
-    
+
 	public String getId() {
 		return id;
 	}
