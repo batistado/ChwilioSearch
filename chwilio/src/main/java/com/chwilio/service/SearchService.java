@@ -37,7 +37,7 @@ public class SearchService implements SearchQueryService {
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, Object> searchQuery(String query, String page) throws SolrServerException, IOException{
+	public Map<String, Object> searchQuery(String query, String page, Map<String, List<String>> filters) throws SolrServerException, IOException{
 		final SolrClient client = solr.getSolrClient();
 		
 		//  Computing the start from the page number
@@ -54,7 +54,22 @@ public class SearchService implements SearchQueryService {
 		
 		final Map<String, String> queryParamMap = new HashMap<String, String>();
 		if(tQuery != null) {
-			queryParamMap.put("q", tQuery.toString());
+			String language = " AND (";
+			for(String lang : filters.get("langs")) {
+				language = language+" lang:"+lang;
+			}
+			String location = " AND (";
+			for(String city : filters.get("cities")) {
+				location = location+" city:"+city;
+			}
+//			String dateFilter = "";
+//			for(String date : filters.get("date")) {
+//				dateFilter = dateFilter + "tweet_date:[NOW-"+date+"DAYS/DAY TO NOW]";
+//				
+//			}
+//			System.out.println(dateFilter);
+			queryParamMap.put("q",  "(" + tQuery.toString()+")" + language +")"+ location +")");
+//			queryParamMap.put("fq",dateFilter);
 		}else {
 		queryParamMap.put("q", query.toString());
 		}
