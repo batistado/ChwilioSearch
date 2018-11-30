@@ -2,6 +2,7 @@ package com.chwilio.controller;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.List;
 
 import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +24,10 @@ public class TweetQuerying {
 	@Autowired
 	SearchQueryService searchService;
 	
-	@RequestMapping(method = RequestMethod.GET, value = "/tweets/all", produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(method = RequestMethod.POST, value = "/tweets/all", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public ResponseEntity<?> getAllTweets(@RequestParam("query") String query, @RequestParam("page") String page) throws SolrServerException, IOException {
-		return new ResponseEntity<Map<String,Object>>(searchService.searchQuery(query, page), HttpStatus.OK);
+	public ResponseEntity<?> getAllTweets(@RequestParam("query") String query, @RequestParam("page") String page, @RequestBody Map<String, List<String>> filters) throws SolrServerException, IOException {
+		return new ResponseEntity<Map<String,Object>>(searchService.searchQuery(query, page, filters), HttpStatus.OK);
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/tweets/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
