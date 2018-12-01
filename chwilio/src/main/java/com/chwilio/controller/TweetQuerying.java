@@ -41,4 +41,10 @@ public class TweetQuerying {
 	public ResponseEntity<?> translateTweet(@RequestBody Map<String, String> tweet) throws SolrServerException, IOException {
 		return new ResponseEntity<>(searchService.getTranslatedTweet(tweet), HttpStatus.OK);
 	}
+	
+	@RequestMapping(method = RequestMethod.POST, value = "/tweets/trending", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<?> getTrendingHashtags(@RequestBody Map<String, List<String>> filters) throws SolrServerException, IOException {
+		return new ResponseEntity<Map<String, List<String>>>(searchService.getTrendingHashtags(filters), HttpStatus.OK);
+	}
 }

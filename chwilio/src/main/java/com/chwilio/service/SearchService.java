@@ -15,6 +15,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.MapSolrParams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.apache.solr.client.solrj.response.FacetField.Count;
 
 import com.chwilio.config.SolrConfig;
 import com.chwilio.model.*;
@@ -34,6 +35,8 @@ public class SearchService implements SearchQueryService {
 	private String tweetUrl;
 	private String userProfileImage;
 	private String tQuery;
+	
+	private int trendingCount = 15;
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -62,14 +65,13 @@ public class SearchService implements SearchQueryService {
 			for(String city : filters.get("cities")) {
 				location = location+" city:"+city;
 			}
-//			String dateFilter = "";
-//			for(String date : filters.get("date")) {
-//				dateFilter = dateFilter + "tweet_date:[NOW-"+date+"DAYS/DAY TO NOW]";
-//				
-//			}
-//			System.out.println(dateFilter);
+			String dateFilter = "";
+			for(String date : filters.get("date")) {
+				dateFilter = dateFilter + "tweet_date:[NOW-"+date+"DAYS/DAY TO NOW]";
+				
+			}
 			queryParamMap.put("q",  "(" + tQuery.toString()+")" + language +")"+ location +")");
-//			queryParamMap.put("fq",dateFilter);
+			queryParamMap.put("fq",dateFilter);
 		}else {
 		queryParamMap.put("q", query.toString());
 		}
@@ -87,7 +89,7 @@ public class SearchService implements SearchQueryService {
 		for(SolrDocument document : documents) {
 			
 			id = document.containsKey("id") ? document.getFieldValue("id").toString() : null;
-			text = document.containsKey("text") ? ((ArrayList<String>) document.getFieldValue("text")).get(0) : null;
+			text = document.containsKey("extended_tweet.full_text") ? ((ArrayList<String>) document.getFieldValue("extended_tweet.full_text")).get(0) : ((ArrayList<String>) document.getFieldValue("text")).get(0);
 			date = document.containsKey("tweet_date") ? ((ArrayList<Date>) document.getFieldValue("tweet_date")).get(0) : null;
 			username = document.containsKey("user.name") ? ((ArrayList<String>) document.getFieldValue("user.name")).get(0) : null;
 			userProfileImage = document.containsKey("user.profile_image_url") ? ((ArrayList<String>) document.getFieldValue("user.profile_image_url")).get(0) : null;
@@ -114,7 +116,7 @@ public class SearchService implements SearchQueryService {
 		
 		SolrDocument document = documents.get(0);
 		id = document.containsKey("id") ? document.getFieldValue("id").toString() : null;
-		text = document.containsKey("text") ? ((ArrayList<String>) document.getFieldValue("text")).get(0) : null;
+		text = document.containsKey("extended_tweet.full_text") ? ((ArrayList<String>) document.getFieldValue("extended_tweet.full_text")).get(0) : ((ArrayList<String>)document.getFieldValue("text")).get(0);
 		city = document.containsKey("city") ? ((ArrayList<String>) document.getFieldValue("city")).get(0) : null;
 		lang = document.containsKey("lang") ? document.getFieldValue("tweet_lang").toString() : null;
 		date = document.containsKey("tweet_date") ? ((ArrayList<Date>) document.getFieldValue("tweet_date")).get(0) : null;
@@ -136,4 +138,49 @@ public class SearchService implements SearchQueryService {
 		}
 		return tweet;
 	}
+	
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Map<String, List<String>> getTrendingHashtags(Map<String, List<String>> filters) throws SolrServerException, IOException{
+		final SolrClient client = solr.getSolrClient();
+			
+		final Map<String, String> queryParamMap = new HashMap<String, String>();
+		String language = "(";
+		for(String lang : filters.get("langs")) {
+			language = language+" lang:"+lang;
+		}
+		String location = " AND (";
+		for(String city : filters.get("cities")) {
+			location = location+" city:"+city;
+		}
+		String dateFilter = "";
+		for(String date : filters.get("date")) {
+			dateFilter = dateFilter + "tweet_date:[NOW-"+date+"DAYS/DAY TO NOW]";
+			
+		}
+		
+		queryParamMap.put("q", language +")"+ location +")");
+		queryParamMap.put("fq", dateFilter);
+		queryParamMap.put("rows", "0");
+		queryParamMap.put("facet", "on");
+		queryParamMap.put("facet.field", "hashtags");
+		MapSolrParams queryParams = new MapSolrParams(queryParamMap);
+
+		final QueryResponse response = client.query("IRF18P4", queryParams);
+		Map<String, List<String>> result = new HashMap<String, List<String>>();
+		List<String> trendingHashtags = new ArrayList<String>();
+		
+		int count = 0;
+		for (Count c: response.getFacetField("hashtags").getValues()) {		
+			if (count++ > trendingCount)
+				break;
+			trendingHashtags.add(c.getName());
+		}
+		
+		result.put("trendingHashtags", trendingHashtags);
+	
+		return result;
+	}
+	
 }
