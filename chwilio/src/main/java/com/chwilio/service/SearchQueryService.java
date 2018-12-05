@@ -13,4 +13,6 @@ public interface SearchQueryService {
 	public TweetDetails getTweetDetails(String id) throws SolrServerException, IOException;
 	public Map<String, String> getTranslatedTweet(Map<String, String> tweet) throws SolrServerException, IOException;
 	public Map<String, List<String>> getTrendingHashtags(Map<String, List<String>> filters) throws SolrServerException, IOException;
+	public Map<String, Object> cityWiseTopics(Map<String, List<String>> filters) throws SolrServerException, IOException;
+	public Map<String, Object> getWordCloud() throws SolrServerException, IOException;
 }
