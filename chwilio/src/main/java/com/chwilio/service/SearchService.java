@@ -2,8 +2,10 @@ package com.chwilio.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +37,7 @@ public class SearchService implements SearchQueryService {
 	private String tweetUrl;
 	private String userProfileImage;
 	private String tQuery;
+	private HashSet<String> topics = new HashSet<>(Arrays.asList("politics", "environment", "crime", "infra", "social unrest"));
 	
 	private int trendingCount = 15;
 	
@@ -140,7 +143,6 @@ public class SearchService implements SearchQueryService {
 	}
 	
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public Map<String, List<String>> getTrendingHashtags(Map<String, List<String>> filters) throws SolrServerException, IOException{
 		final SolrClient client = solr.getSolrClient();
@@ -179,6 +181,108 @@ public class SearchService implements SearchQueryService {
 		}
 		
 		result.put("trendingHashtags", trendingHashtags);
+	
+		return result;
+	}
+	
+	@Override
+	public Map<String, Object> cityWiseTopics(Map<String, List<String>> filters) throws SolrServerException, IOException{
+		final SolrClient client = solr.getSolrClient();
+		
+		MapSolrParams queryParams;
+		QueryResponse response;
+		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Map<String, Long>> cityMap = new HashMap<String, Map<String, Long>>();
+		Map<String, Map<String, Long>> sentimentMap = new HashMap<String, Map<String, Long>>();
+		Map<String, Map<String, Long>> tsMap = new HashMap<String, Map<String, Long>>();
+		
+		for (String city: filters.get("city")) {
+			Map<String, String> queryParamMap = new HashMap<String, String>();
+			queryParamMap.put("q", "city:" + city);
+			queryParamMap.put("rows", "0");
+			queryParamMap.put("facet", "on");
+			queryParamMap.put("facet.field", "topic");
+		    queryParams = new MapSolrParams(queryParamMap);
+			response = client.query("IRF18P4", queryParams);
+			
+			for (Count c: response.getFacetField("topic").getValues()) {
+				if (!this.topics.contains(c.getName()))
+					continue;
+				
+				Map<String, Long> topicMap;
+				if (cityMap.containsKey(city)) {
+					topicMap = cityMap.get(city);
+					topicMap.put(c.getName(), c.getCount());
+					cityMap.put(city, topicMap);
+				} else {
+					topicMap = new HashMap<String, Long>();
+					topicMap.put(c.getName(), c.getCount());
+					cityMap.put(city, topicMap);
+				}
+			}
+			
+			queryParamMap.put("facet.field", "sentiment");
+		    queryParams = new MapSolrParams(queryParamMap);
+			response = client.query("IRF18P4", queryParams);
+			
+			for (Count c: response.getFacetField("sentiment").getValues()) {
+				Map<String, Long> map;
+				if (sentimentMap.containsKey(city)) {
+					map = sentimentMap.get(city);
+					map.put(c.getName(), c.getCount());
+					sentimentMap.put(city, map);
+				} else {
+					map = new HashMap<String, Long>();
+					map.put(c.getName(), c.getCount());
+					sentimentMap.put(city, map);
+				}
+			}
+			
+			queryParamMap.put("facet.field", "tweet_date");
+		    queryParams = new MapSolrParams(queryParamMap);
+			response = client.query("IRF18P4", queryParams);
+			
+			for (Count c: response.getFacetField("tweet_date").getValues()) {
+				Map<String, Long> map;
+				if (tsMap.containsKey(city)) {
+					map = tsMap.get(city);
+					map.put(c.getName(), c.getCount());
+					tsMap.put(city, map);
+				} else {
+					map = new HashMap<String, Long>();
+					map.put(c.getName(), c.getCount());
+					tsMap.put(city, map);
+				}
+			}
+		}
+		
+		result.put("city", cityMap);
+		result.put("sentiment", sentimentMap);
+		result.put("timestamp", tsMap);
+		return result;
+		
+	}
+	
+	@Override
+	public Map<String, Object> getWordCloud() throws SolrServerException, IOException{
+		final SolrClient client = solr.getSolrClient();
+			
+		final Map<String, String> queryParamMap = new HashMap<String, String>();
+		queryParamMap.put("q", "*");
+		queryParamMap.put("rows", "0");
+		queryParamMap.put("facet", "on");
+		queryParamMap.put("facet.field", "hashtags");
+		MapSolrParams queryParams = new MapSolrParams(queryParamMap);
+
+		final QueryResponse response = client.query("IRF18P4", queryParams);
+		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Long> wordCloud = new HashMap<String, Long>();
+		
+		for (Count c: response.getFacetField("hashtags").getValues()) {		
+			wordCloud.put(c.getName(), c.getCount());
+		}
+		
+		result.put("wordCloud", wordCloud);
 	
 		return result;
 	}

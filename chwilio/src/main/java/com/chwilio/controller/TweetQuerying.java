@@ -47,4 +47,16 @@ public class TweetQuerying {
 	public ResponseEntity<?> getTrendingHashtags(@RequestBody Map<String, List<String>> filters) throws SolrServerException, IOException {
 		return new ResponseEntity<Map<String, List<String>>>(searchService.getTrendingHashtags(filters), HttpStatus.OK);
 	}
+	
+	@RequestMapping(method = RequestMethod.POST, value = "/tweets/analytics", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<?> getCityWiseTopics(@RequestBody Map<String, List<String>> filters) throws SolrServerException, IOException {
+		return new ResponseEntity<Map<String, Object>>(searchService.cityWiseTopics(filters), HttpStatus.OK);
+	}
+	
+	@RequestMapping(method = RequestMethod.GET, value = "/tweets/wordcloud", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<?> getWordCloud() throws SolrServerException, IOException {
+		return new ResponseEntity<Map<String, Object>>(searchService.getWordCloud(), HttpStatus.OK);
+	}
 }
