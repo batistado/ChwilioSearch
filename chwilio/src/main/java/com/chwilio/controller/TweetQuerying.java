@@ -1,6 +1,7 @@
 package com.chwilio.controller;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Map;
 import java.util.List;
 
@@ -50,13 +51,13 @@ public class TweetQuerying {
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/tweets/analytics", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public ResponseEntity<?> getCityWiseTopics(@RequestBody Map<String, List<String>> filters) throws SolrServerException, IOException {
+	public ResponseEntity<?> getCityWiseTopics(@RequestBody Map<String, List<String>> filters) throws SolrServerException, IOException, ParseException {
 		return new ResponseEntity<Map<String, Object>>(searchService.cityWiseTopics(filters), HttpStatus.OK);
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/tweets/wordcloud", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public ResponseEntity<?> getWordCloud() throws SolrServerException, IOException {
+	public ResponseEntity<?> getWordCloud() throws SolrServerException, IOException, ParseException {
 		return new ResponseEntity<Map<String, Object>>(searchService.getWordCloud(), HttpStatus.OK);
 	}
 }

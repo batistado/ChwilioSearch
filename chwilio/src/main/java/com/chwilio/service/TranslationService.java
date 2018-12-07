@@ -19,7 +19,7 @@ import com.google.gson.JsonParser;
 
 public class TranslationService {
 
-	private static String subscriptionKey = "6aa9b26c15bc4b348ca525303dd50058";
+	private static String subscriptionKey = "71df830b23684636a5df44f89db22fed";
 
     private static String host = "https://api.cognitive.microsofttranslator.com";
     private static String tpath = "/translate?api-version=3.0";
